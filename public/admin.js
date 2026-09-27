@@ -1,6 +1,8 @@
 let currentUser=null;
+let liveOrdersTimer = null;
 async function api(url,opt){const r=await fetch(url,opt);const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||"Request failed");return j}
-async function login(){try{const x=await api("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user.value,password:pass.value})});currentUser=x.user;loginBox(false);who.textContent=`${currentUser.username} · ${currentUser.role}`;dashboard()}catch(e){alert(e.message)}}
+async function login(){try{const x=await api("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user.value,password:pass.value})});currentUser=x.user;loginBox(false);who.textContent=`${currentUser.username} · ${currentUser.role}`;dashboard();
+startLiveOrdersRefresh();}catch(e){alert(e.message)}}
 function loginBox(show){document.getElementById("login").classList.toggle("hidden",!show);document.getElementById("app").classList.toggle("hidden",show)}
 async function logout(){await api("/api/logout",{method:"POST"});location.reload()}
 async function dashboard(){try{const today=new Date().toISOString().slice(0,10);const x=await api(`/api/reports/summary?from=${today}&to=${today}`);content.innerHTML=`<h2>Today's Dashboard</h2><div class="metrics"><div class="metric">Orders<b>${x.orders}</b></div><div class="metric">Sales<b>₹${Number(x.sales.sales).toFixed(2)}</b></div><div class="metric">GST<b>₹${Number(x.sales.gst).toFixed(2)}</b></div><div class="metric">Profit before other adjustments<b>₹${Number(x.profit).toFixed(2)}</b></div></div><div class="card"><h3>Top selling items</h3><table><tr><th>Item</th><th>Qty</th><th>Sales</th></tr>${x.topItems.map(i=>`<tr><td>${i.item_name}</td><td>${i.quantity}</td><td>₹${Number(i.sales).toFixed(2)}</td></tr>`).join("")}</table></div><div class="card"><h3>Payment modes</h3>${x.payments.map(p=>`<p>${p.payment_mode}: ₹${Number(p.amount).toFixed(2)} (${p.count})</p>`).join("")}</div>`}catch(e){content.innerHTML=`<div class="card">${e.message}</div>`}}
@@ -26,7 +28,7 @@ async function liveOrders(){
           <h3>
             Order #${o.order_no}
             · ${o.table_name}
-            · <span>${o.status}</span>
+            · ${o.status}
           </h3>
 
           <p>
@@ -38,9 +40,10 @@ async function liveOrders(){
             `).join("")}
           </p>
 
-          ${o.customer_note
-            ? `<p><b>Note:</b> ${o.customer_note}</p>`
-            : ""
+          ${
+            o.customer_note
+              ? `<p><b>Note:</b> ${o.customer_note}</p>`
+              : ""
           }
 
           <small>${o.created_at}</small>
@@ -61,24 +64,45 @@ async function liveOrders(){
         </div>
       `}
     `;
+
   } catch(e) {
-    content.innerHTML = `
-      <div class="card">${e.message}</div>
-    `;
+    content.innerHTML = `<div class="card">${e.message}</div>`;
   }
 }
+function startLiveOrdersRefresh(){
 
+  // Prevent multiple timers
+  if(liveOrdersTimer){
+    clearInterval(liveOrdersTimer);
+  }
+
+  liveOrdersTimer = setInterval(() => {
+
+    // Refresh only when Live Orders page is open
+    const heading = document.querySelector("#content h2");
+
+    if(heading && heading.textContent === "Live Orders"){
+      liveOrders();
+    }
+
+  }, 5000);
+}
 async function changeOrderStatus(id,status){
   try {
+
     await api("/api/staff/orders/"+id,{
       method:"PATCH",
       headers:{
         "Content-Type":"application/json"
       },
-      body:JSON.stringify({status})
+      body:JSON.stringify({
+        status: status
+      })
     });
 
+    // Refresh orders immediately
     liveOrders();
+
   } catch(e) {
     alert(e.message);
   }

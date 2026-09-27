@@ -10,7 +10,7 @@ const crypto = require("crypto");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
-const APP_URL = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, "");
+const APP_URL = (process.env.APP_URL || `https://restro-app-oe24.onrender.com/:${PORT}`).replace(/\/$/, "");
 const DB_FILE = path.join(__dirname, "data", "restaurant.db");
 
 fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });

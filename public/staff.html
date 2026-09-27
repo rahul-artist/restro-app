@@ -1,0 +1,4 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Restaurant Staff</title><link rel="stylesheet" href="/staff.css"></head>
+<body><header><div><h1>Restaurant Operations</h1><p id="who"></p></div><button onclick="logout()">Logout</button></header>
+<main><section id="login" class="card"><h2>Staff Login</h2><input id="user" placeholder="Username"><input id="pass" type="password" placeholder="Password"><button onclick="login()">Login</button><p class="hint">Demo: waiter / Waiter123! · cashier / Cashier123! · kitchen / Kitchen123!</p></section>
+<section id="app" class="hidden"><div class="tabs"><button onclick="showOrders()">Live Orders</button><button onclick="showTables()">Tables</button></div><div id="content"></div></section></main><script src="/staff.js"></script></body></html>

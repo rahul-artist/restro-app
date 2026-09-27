@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  restaurant-qr-pos:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      APP_URL: http://localhost:3000
+      SESSION_SECRET: change-this-secret-in-production
+      ADMIN_USER: admin
+      ADMIN_PASSWORD: ChangeMe123!
+    volumes:
+      - ./data:/app/data
+      - ./public/images:/app/public/images
+    restart: unless-stopped

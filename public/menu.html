@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Restaurant Menu</title><link rel="stylesheet" href="/menu.css"></head>
+<body>
+<header class="hero"><div class="brand"><div class="logo">🍽️</div><div><h1 id="rname">Restaurant</h1><p id="table"></p></div></div><input id="search" placeholder="Search food..." type="search"></header>
+<nav id="cats"></nav>
+<main id="menu"></main>
+<button id="cartBtn" class="cart-float" onclick="openCart()">🛒 Cart <span id="cartCount">0</span></button>
+<div id="modal" class="modal hidden"><div class="sheet"><button class="close" onclick="closeModal()">×</button><div id="modalBody"></div></div></div>
+<div id="toast" class="toast"></div>
+<script src="/menu.js"></script></body></html>

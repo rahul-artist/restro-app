@@ -1,6 +1,13 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Restaurant Admin</title><link rel="stylesheet" href="/admin.css"></head>
 <body><header><div><h1>Restaurant Admin & Business Dashboard</h1><p id="who"></p></div><button onclick="logout()">Logout</button></header>
 <main><section id="login" class="card"><h2>Login</h2><input id="user" placeholder="Username"><input id="pass" type="password" placeholder="Password"><button onclick="login()">Login</button><p class="hint">Demo owner: admin / ChangeMe123!</p></section>
-<section id="app" class="hidden">
-<nav class="tabs"><button onclick="dashboard()">Dashboard</button><button onclick="billing()">Billing</button><button onclick="tables()">Tables & QR</button><button onclick="settings()">GST / Business</button><button onclick="audit()">Audit</button><button onclick="ca()">CA / ITR</button></nav>
+<section id="app" class="hidden"><nav class="tabs">
+<button onclick="dashboard()">Dashboard</button>
+<button onclick="liveOrders()">Live Orders</button>
+<button onclick="billing()">Billing</button>
+<button onclick="tables()">Tables & QR</button>
+<button onclick="settings()">GST / Business</button>
+<button onclick="audit()">Audit</button>
+<button onclick="ca()">CA / ITR</button>
+</nav><nav class="tabs"><button onclick="dashboard()">Dashboard</button><button onclick="billing()">Billing</button><button onclick="tables()">Tables & QR</button><button onclick="settings()">GST / Business</button><button onclick="audit()">Audit</button><button onclick="ca()">CA / ITR</button></nav>
 <div id="content"></div></section></main><script src="/admin.js"></script></body></html>

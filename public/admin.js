@@ -14,4 +14,73 @@ async function settings(){const x=await api("/api/admin/settings");content.inner
 async function saveSettings(){const obj={};["restaurant_name","tagline","phone","address","gstin","state","state_code","default_gst_rate"].forEach(k=>obj[k]=document.getElementById("s_"+k).value);await api("/api/admin/settings",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(obj)});alert("Saved")}
 async function audit(){const rows=await api("/api/reports/audit");content.innerHTML=`<h2>Audit Log</h2><div class="card"><table><tr><th>Time</th><th>Actor</th><th>Role</th><th>Action</th><th>Entity</th><th>Details</th></tr>${rows.map(x=>`<tr><td>${x.created_at}</td><td>${x.actor}</td><td>${x.role}</td><td>${x.action}</td><td>${x.entity_type}</td><td>${x.details}</td></tr>`).join("")}</table></div>`}
 async function ca(){const x=await api("/api/reports/summary");content.innerHTML=`<h2>CA / ITR Data Centre</h2><div class="card"><p>Use these exports as source records for review by your CA/accountant.</p><div class="actions"><a href="/api/ca/export/sales">Sales Register CSV</a><a href="/api/ca/export/gst">GST Summary CSV</a><a href="/api/ca/export/expenses">Expenses CSV</a><a href="/api/ca/export/audit">Audit Log CSV</a></div><h3>Current summary</h3><p>Sales: ₹${x.sales.sales.toFixed(2)}</p><p>GST: ₹${x.sales.gst.toFixed(2)}</p><p>Expenses: ₹${x.expenses.toFixed(2)}</p><p>Profit before other adjustments: ₹${x.profit.toFixed(2)}</p></div><div class="card"><b>Note:</b> ITR filing itself should be completed/reviewed by the taxpayer and/or qualified tax professional. The application provides organized source data and reports, not tax advice.</div>`}
+async function liveOrders(){
+  try {
+    const rows = await api("/api/staff/orders");
+
+    content.innerHTML = `
+      <h2>Live Orders</h2>
+
+      ${rows.map(o => `
+        <article class="card">
+          <h3>
+            Order #${o.order_no}
+            · ${o.table_name}
+            · <span>${o.status}</span>
+          </h3>
+
+          <p>
+            ${o.items.map(i => `
+              ${i.item_name} × ${i.quantity}
+              ${i.customization ? ` (${i.customization})` : ""}
+              — ₹${Number(i.line_total).toFixed(2)}
+              <br>
+            `).join("")}
+          </p>
+
+          ${o.customer_note
+            ? `<p><b>Note:</b> ${o.customer_note}</p>`
+            : ""
+          }
+
+          <small>${o.created_at}</small>
+
+          <div style="margin-top:10px">
+            ${["ACCEPTED","PREPARING","READY","SERVED","CANCELLED"]
+              .map(s => `
+                <button onclick="changeOrderStatus('${o.id}','${s}')">
+                  ${s}
+                </button>
+              `).join(" ")
+            }
+          </div>
+        </article>
+      `).join("") || `
+        <div class="card">
+          No active orders.
+        </div>
+      `}
+    `;
+  } catch(e) {
+    content.innerHTML = `
+      <div class="card">${e.message}</div>
+    `;
+  }
+}
+
+async function changeOrderStatus(id,status){
+  try {
+    await api("/api/staff/orders/"+id,{
+      method:"PATCH",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({status})
+    });
+
+    liveOrders();
+  } catch(e) {
+    alert(e.message);
+  }
+}
 (async()=>{const m=await api("/api/me");if(m.user){currentUser=m.user;loginBox(false);who.textContent=`${m.user.username} · ${m.user.role}`;dashboard()}})();
